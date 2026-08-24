@@ -429,7 +429,8 @@ function setSyncDot(state){
 async function api(body){
   try{
     setSyncDot("loading");
-    const r=await fetch(API,{method:"POST",body:JSON.stringify(body)});
+    const params=new URLSearchParams(body).toString();
+    const r=await fetch(API+"?"+params,{method:"GET"});
     const data=await r.json();
     setSyncDot(data.ok?"ok":"err");
     return data;
