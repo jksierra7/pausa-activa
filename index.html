@@ -255,6 +255,49 @@ button:focus-visible,.session .steps li:focus-visible,.ex-card:focus-visible{out
 .av-thumb{height:92px;width:auto;display:block;}
 .ex-info{min-width:0;}
 @media(max-width:480px){.stage-body{height:290px;}.avatar-holder{height:270px;}.stage-cap{font-size:16px;}}
+
+/* ── DASHBOARD ── */
+.wrap.wide{max-width:1120px;}
+.card-title.sm{font-size:15px;margin-bottom:12px;}
+.dash-filter-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+.dash-filter-row .report-tabs{margin:0;flex-wrap:wrap;}
+.dash-actions{display:flex;gap:8px;align-items:center;}
+button.ghost.sm{font-size:13px;padding:7px 12px;}
+.dash-meta{margin-top:8px;}
+.dash-banner{background:var(--amber-light);border:1.5px solid #FFCC80;color:#8A4B00;border-radius:12px;padding:11px 14px;font-size:13.5px;margin-bottom:14px;line-height:1.5;}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px;}
+@media(max-width:860px){.kpi-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:520px){.kpi-grid{grid-template-columns:1fr 1fr;}}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow);}
+.kpi-num{font-family:"Space Grotesk",sans-serif;font-size:28px;font-weight:700;color:var(--blue);line-height:1.1;}
+.kpi-label{font-size:12.5px;color:var(--ink);font-weight:600;margin-top:4px;}
+.kpi-sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.dash-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.dash-cols>.card{margin-bottom:14px;min-width:0;}
+@media(max-width:760px){.dash-cols{grid-template-columns:1fr;}}
+.chart svg{width:100%;height:auto;display:block;}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:6px;}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;}
+.hbar{display:grid;grid-template-columns:150px 1fr 34px;gap:8px;align-items:center;font-size:12.5px;margin-bottom:7px;}
+.hbar .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hbar .b{background:var(--bg2);border-radius:5px;height:10px;overflow:hidden;}
+.hbar .b i{display:block;height:100%;border-radius:5px;}
+.hbar .n{font-family:"IBM Plex Mono",monospace;text-align:right;color:var(--muted);}
+.today-list{max-height:290px;overflow:auto;}
+.today-row{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--bg2);font-size:13px;}
+.chip{font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:99px;white-space:nowrap;}
+.chip.ok{background:var(--green-light);color:var(--green);}
+.chip.pl{background:#E8F5E9;color:#388E3C;}
+.chip.no{background:var(--amber-light);color:var(--amber);}
+.table-tools{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.table-tools input{font-family:"Inter",sans-serif;font-size:13px;padding:8px 11px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg);min-width:220px;}
+.table-scroll{overflow-x:auto;}
+.table-scroll table{min-width:640px;}
+th.sortable{cursor:pointer;user-select:none;}
+th.sortable:hover{color:var(--blue);}
+td.c,th.c{text-align:center;}
+.mail-input{min-width:240px;font-family:"Inter",sans-serif;}
+.pct-ok{color:var(--green);font-weight:700;}.pct-mid{color:var(--amber);font-weight:700;}.pct-low{color:var(--red);font-weight:700;}
 </style>
 </head>
 <body>
@@ -403,23 +446,59 @@ button:focus-visible,.session .steps li:focus-visible,.ex-card:focus-visible{out
     <div class="card gate-wrap" id="gateCard">
       <div class="card-title">Acceso · Coordinador de Bienestar</div>
       <p class="small" style="margin-bottom:4px;">Área exclusiva para seguimiento del equipo.</p>
-      <input type="password" id="gateInput" placeholder="Clave de acceso">
+      <input type="password" id="gateInput" placeholder="Clave de acceso" autocomplete="current-password">
       <button class="primary" style="background:var(--blue);color:#fff;width:100%;" id="gateBtn">Entrar</button>
       <p class="err" id="gateErr"></p>
     </div>
     <div id="reportArea" style="display:none">
-      <div class="card">
-        <div class="report-tabs">
-          <button class="report-tab active" data-rtab="semana">Esta semana</button>
-          <button class="report-tab" data-rtab="mes">Este mes</button>
+      <div class="card dash-filters">
+        <div class="dash-filter-row">
+          <div class="report-tabs">
+            <button class="report-tab active" data-rtab="semana">Esta semana</button>
+            <button class="report-tab" data-rtab="mes">Por mes</button>
+            <button class="report-tab" data-rtab="rango">Rango de fechas</button>
+          </div>
+          <div class="dash-actions">
+            <button class="ghost sm" id="dlExcel">⬇ Excel</button>
+            <button class="ghost sm" id="dlCsv">⬇ CSV</button>
+            <button class="link-btn" id="refreshBtn">↻ Actualizar</button>
+          </div>
         </div>
-        <div class="row">
+        <div class="row" id="periodInputs" style="margin-top:10px;display:none">
           <input class="month-input" type="month" id="monthInput" style="display:none">
-          <button class="link-btn" id="refreshBtn">↻ Actualizar</button>
+          <span id="rangeInputs" style="display:none" class="row">
+            <label class="small">Desde <input class="month-input" type="date" id="fromInput"></label>
+            <label class="small">Hasta <input class="month-input" type="date" id="toInput"></label>
+          </span>
         </div>
+        <p class="small dash-meta" id="dashMeta"></p>
       </div>
-      <div class="stat-grid" id="statGrid"></div>
-      <div class="card" id="tableCard"><p class="small">Cargando...</p></div>
+      <div class="dash-banner" id="dashBanner" style="display:none"></div>
+      <div class="kpi-grid" id="statGrid"></div>
+
+      <div class="dash-cols">
+        <div class="card" id="todayCard"></div>
+        <div class="card"><div class="card-title sm">Pausas por día</div><div id="chartDays"></div></div>
+      </div>
+      <div class="dash-cols">
+        <div class="card"><div class="card-title sm">¿A qué hora hacen la pausa?</div><div id="chartHours"></div></div>
+        <div class="card"><div class="card-title sm">Ejercicios más usados</div><div id="chartCats"></div></div>
+      </div>
+
+      <div class="card" id="tableCard"><p class="small">Cargando…</p></div>
+      <div class="card" id="detailCard"></div>
+
+      <div class="card mail-card">
+        <div class="card-title sm">✉️ Reporte mensual por correo</div>
+        <p class="small" style="margin-bottom:10px">Se envía solo el día 1 de cada mes con el resumen del mes anterior y el detalle en archivos para Excel. También puedes enviarlo ahora.</p>
+        <div class="row">
+          <label class="small">Mes <input class="month-input" type="month" id="mailMonth"></label>
+          <input class="month-input mail-input" type="email" id="mailTo" placeholder="Correo (vacío = el configurado)">
+          <button class="primary" style="background:var(--blue);color:#fff;" id="mailBtn">Enviar reporte</button>
+        </div>
+        <p class="small" id="mailMsg" style="margin-top:8px"></p>
+      </div>
+      <p class="small" style="text-align:right"><button class="link-btn" id="logoutBtn">Cerrar panel</button></p>
     </div>
   </section>
 
@@ -440,8 +519,7 @@ button:focus-visible,.session .steps li:focus-visible,.ex-card:focus-visible{out
 <div class="toast" id="toast"></div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbz0TVSFVN46PZufbfoCZr-TmcWBe9ddTLtW7_OujElw32MZRTgHjy0kgh7gKrG3cLRu/exec";
-const GATE = "bienestar2026";
+const API = "https://script.google.com/macros/s/AKfycbydwybuNzv0ujafgSHJtNRUjngwXlrsn0fyTuY9Yog7RhOIy0qSA6V8ctNGgxQXqXgK/exec";
 const TOTAL_WEEK = 10;
 const TOTAL_SECS = 300;
 const CIRC = 326.7;
@@ -886,8 +964,9 @@ document.getElementById("ctaSecondary").addEventListener("click",()=>document.qu
 /* ── PLANTA ── */
 async function markPlanta(session){
   if(!employeeName){alert("Escribe tu nombre primero.");return;}
-  const res=await api({action:"register",name:employeeName,session,type:"planta",exercise:"Pausa en planta",category:"planta",device:navigator.userAgent.includes("Mobile")?"mobile":"desktop"});
-  if(res.ok){
+  const res=await api({action:"register",name:employeeName,session,type:"planta",exercise:"Pausa en planta",category:"planta",duration:300,device:navigator.userAgent.includes("Mobile")?"mobile":"desktop"});
+  if(res.ok&&res.duplicate){showToast("Esa pausa ya estaba registrada ✓");await loadPersonData();}
+  else if(res.ok){
     dayCache[session]=new Date().toISOString();dayCache[session+"Planta"]=true;
     if(weekCache.days&&weekCache.days[todayStr()]){weekCache.days[todayStr()][session]=new Date().toISOString();weekCache.days[todayStr()][session+"Planta"]=true;weekCache.total=(weekCache.total||0)+1;}
     renderStatus();renderWeekProgress();
@@ -1061,9 +1140,10 @@ document.getElementById("completeBtn").addEventListener("click",async()=>{
     if(left>60&&!confirm(`Aún faltan ${Math.ceil(left/60)} min de la pausa. ¿Quieres registrarla de todos modos?`))return;}
   const btn=document.getElementById("completeBtn");btn.disabled=true;btn.textContent="Guardando…";
   const ex=S?S.ex:null;const sess=currentSession();
-  const res=await api({action:"register",name:employeeName,session:sess,type:"app",exercise:ex?ex.title:"",category:ex?ex.catId:"",device:navigator.userAgent.includes("Mobile")?"mobile":"desktop"});
+  const res=await api({action:"register",name:employeeName,session:sess,type:"app",exercise:ex?ex.title:"",category:ex?ex.catId:"",duration:S?Math.round(Math.min(S.elapsed,TOTAL_SECS)):0,device:navigator.userAgent.includes("Mobile")?"mobile":"desktop"});
   btn.disabled=false;btn.textContent="✓ Registrar pausa";
-  if(res.ok){
+  if(res.ok&&res.duplicate){endSession();showToast("Esa pausa ya estaba registrada hoy ✓");await loadPersonData();}
+  else if(res.ok){
     dayCache[sess]=new Date().toISOString();dayCache[sess+"Planta"]=false;
     if(weekCache.days&&weekCache.days[todayStr()]){weekCache.days[todayStr()][sess]=new Date().toISOString();weekCache.total=(weekCache.total||0)+1;}
     else if(weekCache.days){weekCache.days[todayStr()]={[sess]:new Date().toISOString()};weekCache.total=(weekCache.total||0)+1;}
@@ -1107,53 +1187,254 @@ document.querySelectorAll(".tab-btn").forEach(btn=>btn.addEventListener("click",
   document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
   btn.classList.add("active");document.getElementById("panel-"+btn.dataset.tab).classList.add("active");
   if(btn.dataset.tab==="podio")loadPodio();
+  document.querySelector(".wrap").classList.toggle("wide",btn.dataset.tab==="reporte");
+  if(btn.dataset.tab==="reporte"&&repKey&&!dash.res)showDash();
 }));
 
-/* ── REPORTE ── */
-document.getElementById("gateBtn").addEventListener("click",()=>{
-  if(document.getElementById("gateInput").value===GATE){
-    document.getElementById("gateCard").style.display="none";
-    document.getElementById("reportArea").style.display="block";
-    const now=new Date();document.getElementById("monthInput").value=now.getFullYear()+"-"+pad(now.getMonth()+1);
-    loadReport("semana");
-  }else document.getElementById("gateErr").textContent="Clave incorrecta.";
+/* ── REPORTE / DASHBOARD ── */
+let repKey=sessionStorage.getItem("paClave")||"";
+const dash={mode:"semana",res:null,people:[],records:[],sort:"pct",dir:-1,q:"",all:false,label:""};
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const CAT_NAMES=Object.fromEntries(CATS.map(c=>[c.id,c.name]));CAT_NAMES.planta="En planta";
+const DOW=["D","L","M","X","J","V","S"];
+const fmtDate=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("es-CO",{day:"numeric",month:"short"});};
+const fmtMin=sec=>sec?(Math.round(sec/6)/10).toString().replace(".",","):"—";
+function pctClass(p){return p>=80?"pct-ok":p>=50?"pct-mid":"pct-low";}
+
+document.getElementById("gateBtn").addEventListener("click",async()=>{
+  const k=document.getElementById("gateInput").value.trim(),err=document.getElementById("gateErr"),btn=document.getElementById("gateBtn");
+  if(!k){err.textContent="Escribe la clave.";return;}
+  btn.disabled=true;btn.textContent="Validando…";err.textContent="";
+  const res=await api({action:"getReport",key:k,mode:"semana"});
+  btn.disabled=false;btn.textContent="Entrar";
+  if(res.ok){repKey=k;sessionStorage.setItem("paClave",k);showDash();}
+  else err.textContent=res.error&&/clave/i.test(res.error)?"Clave incorrecta.":"No se pudo conectar con Google Sheets. Revisa tu conexión.";
 });
+document.getElementById("gateInput").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("gateBtn").click();});
+document.getElementById("logoutBtn").addEventListener("click",()=>{repKey="";sessionStorage.removeItem("paClave");dash.res=null;
+  document.getElementById("reportArea").style.display="none";document.getElementById("gateCard").style.display="block";document.getElementById("gateInput").value="";});
+
+function showDash(){
+  document.getElementById("gateCard").style.display="none";
+  document.getElementById("reportArea").style.display="block";
+  const now=new Date(),mm=now.getFullYear()+"-"+pad(now.getMonth()+1);
+  const prev=new Date(now.getFullYear(),now.getMonth()-1,1);
+  document.getElementById("monthInput").value=mm;
+  document.getElementById("mailMonth").value=prev.getFullYear()+"-"+pad(prev.getMonth()+1);
+  document.getElementById("toInput").value=todayStr();
+  document.getElementById("fromInput").value=mm+"-01";
+  loadDash();
+}
 document.querySelectorAll(".report-tab").forEach(t=>t.addEventListener("click",()=>{
   document.querySelectorAll(".report-tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");
-  document.getElementById("monthInput").style.display=t.dataset.rtab==="mes"?"inline-block":"none";
-  loadReport(t.dataset.rtab);
+  dash.mode=t.dataset.rtab;
+  document.getElementById("periodInputs").style.display=dash.mode==="semana"?"none":"flex";
+  document.getElementById("monthInput").style.display=dash.mode==="mes"?"inline-block":"none";
+  document.getElementById("rangeInputs").style.display=dash.mode==="rango"?"inline-flex":"none";
+  loadDash();
 }));
-document.getElementById("refreshBtn").addEventListener("click",()=>{const a=document.querySelector(".report-tab.active");loadReport(a?a.dataset.rtab:"semana");});
+["monthInput","fromInput","toInput"].forEach(id=>document.getElementById(id).addEventListener("change",()=>loadDash()));
+document.getElementById("refreshBtn").addEventListener("click",()=>loadDash());
 
-async function loadReport(mode){
-  document.getElementById("tableCard").innerHTML='<p class="small">Cargando desde Google Sheets…</p>';
-  document.getElementById("statGrid").innerHTML="";
-  const body={action:"getReport",key:GATE,mode};
-  if(mode==="mes")body.month=document.getElementById("monthInput").value;
-  const res=await api(body);
-  if(!res.ok){document.getElementById("tableCard").innerHTML=`<p class="err">${res.error||"Error al cargar"}</p>`;return;}
-  const{people,bdays}=res;const names=Object.keys(people||{});
-  const maxP=bdays*2;const totalDone=names.reduce((a,s)=>a+people[s].am+people[s].pm,0);
-  const totalPoss=maxP*(names.length||1);const ovPct=totalPoss?Math.round((totalDone/totalPoss)*100):0;
-  const plantas=names.reduce((a,s)=>a+people[s].planta,0);
-  document.getElementById("statGrid").innerHTML=`
-    <div class="stat-card"><div class="stat-num">${ovPct}%</div><div class="stat-label">Participación general</div></div>
-    <div class="stat-card"><div class="stat-num">${names.length}</div><div class="stat-label">Personas registradas</div></div>
-    <div class="stat-card"><div class="stat-num">${plantas}</div><div class="stat-label">Pausas en planta</div></div>`;
-  if(!names.length){document.getElementById("tableCard").innerHTML='<p class="small">Sin registros en este período.</p>';return;}
-  const rows=names.map(s=>{const p=people[s];const done=p.am+p.pm;const pct=maxP?Math.round((done/maxP)*100):0;return{name:p.name,am:p.am,pm:p.pm,planta:p.planta,pct};}).sort((a,b)=>b.pct-a.pct);
-  document.getElementById("tableCard").innerHTML=`<table><thead><tr><th>Persona</th><th>Mañana</th><th>Tarde</th><th>🏭 Planta</th><th>Cumplimiento</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.name}</td><td class="mono">${r.am}/${bdays}</td><td class="mono">${r.pm}/${bdays}</td><td class="mono">${r.planta}</td><td><span class="bar-bg"><span class="bar-fill" style="width:${r.pct}%"></span></span>${r.pct}%</td></tr>`).join("")}</tbody></table>`;
+function periodParams(){
+  if(dash.mode==="mes")return{mode:"mes",month:document.getElementById("monthInput").value};
+  if(dash.mode==="rango"){const f=document.getElementById("fromInput").value,t=document.getElementById("toInput").value;
+    if(f&&t)return f<=t?{mode:"rango",from:f,to:t}:{mode:"rango",from:t,to:f};}
+  return{mode:"semana"};
 }
+
+async function loadDash(){
+  if(!repKey)return;
+  const banner=document.getElementById("dashBanner");banner.style.display="none";
+  document.getElementById("tableCard").innerHTML='<p class="small">Cargando desde Google Sheets…</p>';
+  const params=periodParams();
+  const res=await api({action:"getRecords",key:repKey,...params});
+  if(res.ok){dash.res=res;renderDash(res);return;}
+  if(res.error&&/clave/i.test(res.error)){document.getElementById("logoutBtn").click();document.getElementById("gateErr").textContent="La clave cambió. Vuelve a ingresar.";return;}
+  // Apps Script anterior: solo existe getReport
+  const old=await api({action:"getReport",key:repKey,mode:params.mode==="mes"?"mes":"semana",month:params.month||""});
+  banner.innerHTML="<b>Falta actualizar el Apps Script.</b> Con el código nuevo verás horas, tiempos, el detalle de cada pausa, las descargas y el envío por correo. Mientras tanto se muestra el resumen básico.";
+  banner.style.display="block";
+  if(old.ok){
+    const recs=[];
+    renderDash({records:recs,bdays:old.bdays,workdays:[],from:"",to:"",legacy:old.people,meta:null});
+  }else document.getElementById("tableCard").innerHTML=`<p class="err">${esc(old.error||"No se pudo cargar el reporte.")}</p>`;
+}
+
+function buildPeople(res){
+  if(res.legacy)return Object.values(res.legacy).map(p=>({name:p.name,am:p.am,pm:p.pm,planta:p.planta||0,app:p.am+p.pm-(p.planta||0),seconds:0,last:"",timed:0}));
+  const m={};
+  res.records.forEach(r=>{const p=m[r.key]||(m[r.key]={name:r.name,am:0,pm:0,planta:0,app:0,seconds:0,timed:0,last:""});
+    p[r.session]++;p[r.type]++;if(r.duration){p.seconds+=r.duration;p.timed++;}if(r.ts>p.last){p.last=r.ts;p.name=r.name;}});
+  return Object.values(m);
+}
+
+function renderDash(res){
+  const recs=res.records||[],bd=res.bdays||1,poss=bd*2;
+  dash.records=recs;
+  dash.people=buildPeople(res).map(p=>({...p,total:p.am+p.pm,pct:Math.round((p.am+p.pm)/poss*100)}));
+  const n=dash.people.length,total=dash.people.reduce((a,p)=>a+p.total,0);
+  const part=n?Math.round(total/(poss*n)*100):0;
+  const planta=dash.people.reduce((a,p)=>a+p.planta,0);
+  const timed=recs.filter(r=>r.duration&&r.type==="app");
+  const avg=timed.length?timed.reduce((a,r)=>a+r.duration,0)/timed.length:0;
+  const today=todayStr(),tAm=recs.filter(r=>r.date===today&&r.session==="am").length,tPm=recs.filter(r=>r.date===today&&r.session==="pm").length;
+  dash.label=res.from?`${res.from}_a_${res.to}`:"periodo";
+  const meta=res.meta;
+  document.getElementById("dashMeta").textContent=res.from?
+    `Del ${fmtDate(res.from)} al ${fmtDate(res.to)} · ${bd} día${bd===1?"":"s"} hábil${bd===1?"":"es"} a la fecha · meta: ${poss} pausas por persona`+
+    (meta?` · La hoja "${meta.hoja}" tiene ${meta.totalHoja} registros${meta.ultimo?` (último: ${fmtDate(meta.ultimo)})`:""}`:""):"";
+  const kpi=(num,label,sub)=>`<div class="kpi"><div class="kpi-num">${num}</div><div class="kpi-label">${label}</div>${sub?`<div class="kpi-sub">${sub}</div>`:""}</div>`;
+  document.getElementById("statGrid").innerHTML=
+    kpi(part+"%","Participación","de las pausas posibles")+
+    kpi(n,"Personas activas","con al menos una pausa")+
+    kpi(total,"Pausas registradas",`${total-planta} en app · ${planta} en planta`)+
+    kpi(avg?fmtMin(avg)+" min":"—","Tiempo promedio","en pausas hechas en la app")+
+    kpi(`${tAm} / ${tPm}`,"Hoy: mañana / tarde","personas que ya la hicieron");
+
+  // Hoy
+  const todayRecs=recs.filter(r=>r.date===today);
+  const byKey={};todayRecs.forEach(r=>{(byKey[r.key]=byKey[r.key]||{name:r.name})[r.session]=r;});
+  const everyone=[...new Map(recs.map(r=>[r.key,r.name])).entries()];
+  const chip=r=>r?`<span class="chip ${r.type==="planta"?"pl":"ok"}">${r.type==="planta"?"🏭":"✓"} ${r.time}</span>`:`<span class="chip no">pendiente</span>`;
+  const rows=everyone.map(([k,nm])=>({nm,a:byKey[k]&&byKey[k].am,p:byKey[k]&&byKey[k].pm}))
+    .sort((x,y)=>(!!y.a+!!y.p)-(!!x.a+!!x.p)||x.nm.localeCompare(y.nm));
+  document.getElementById("todayCard").innerHTML=`<div class="card-title sm">¿Quién hizo la pausa hoy?</div>`+
+    (res.legacy?'<p class="small">Disponible al actualizar el Apps Script.</p>':
+     !rows.length?'<p class="small">Aún no hay personas registradas en este período.</p>':
+     `<div class="today-row" style="font-size:11px;color:var(--muted);font-weight:600"><span>Persona</span><span>Mañana</span><span>Tarde</span></div>
+      <div class="today-list">${rows.map(r=>`<div class="today-row"><span>${esc(r.nm)}</span>${chip(r.a)}${chip(r.p)}</div>`).join("")}</div>`);
+
+  renderCharts(res);
+  renderPeopleTable();
+  renderDetail();
+}
+
+function renderCharts(res){
+  const recs=res.records||[];
+  // por día
+  const days=(res.workdays||[]).filter(d=>d<=todayStr());
+  const el=document.getElementById("chartDays");
+  if(!days.length||res.legacy){el.innerHTML='<p class="small">Sin datos por día.</p>';}
+  else{
+    const cnt=days.map(d=>({d,app:recs.filter(r=>r.date===d&&r.type==="app").length,pl:recs.filter(r=>r.date===d&&r.type==="planta").length}));
+    const max=Math.max(1,...cnt.map(c=>c.app+c.pl)),W=600,H=200,bw=Math.min(46,(W-20)/cnt.length*.7),step=(W-20)/cnt.length;
+    el.innerHTML=`<div class="chart"><svg viewBox="0 0 ${W} ${H+26}" role="img" aria-label="Pausas por día">
+      ${cnt.map((c,i)=>{const x=10+i*step+(step-bw)/2,ha=c.app/max*(H-20),hp=c.pl/max*(H-20);
+        const[y,m,dd]=c.d.split("-").map(Number),dw=DOW[new Date(y,m-1,dd).getDay()];
+        return `<rect x="${x}" y="${H-ha}" width="${bw}" height="${ha}" rx="3" fill="#1565C0"/>
+          <rect x="${x}" y="${H-ha-hp}" width="${bw}" height="${hp}" rx="3" fill="#66BB6A"/>
+          ${c.app+c.pl?`<text x="${x+bw/2}" y="${H-ha-hp-5}" text-anchor="middle" font-size="11" fill="#5B6B7D">${c.app+c.pl}</text>`:""}
+          ${cnt.length<=31?`<text x="${x+bw/2}" y="${H+16}" text-anchor="middle" font-size="${cnt.length>12?9:11}" fill="#5B6B7D">${dw}${dd}</text>`:""}`;}).join("")}
+      <line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="#D6E0EC"/></svg>
+      <div class="legend"><span><i style="background:#1565C0"></i>En la app</span><span><i style="background:#66BB6A"></i>En planta</span></div></div>`;
+  }
+  // por hora
+  const hEl=document.getElementById("chartHours");
+  const withTime=recs.filter(r=>r.time);
+  if(!withTime.length){hEl.innerHTML='<p class="small">Sin horas registradas en este período.</p>';}
+  else{
+    const hours=[];for(let h=7;h<=18;h++)hours.push(h);
+    const c=hours.map(h=>withTime.filter(r=>+r.time.slice(0,2)===h).length),max=Math.max(1,...c),W=600,H=170,step=(W-20)/hours.length,bw=step*.62;
+    const lbl=h=>(h%12||12)+(h<12?"a":"p");
+    hEl.innerHTML=`<div class="chart"><svg viewBox="0 0 ${W} ${H+24}" role="img" aria-label="Pausas por hora">
+      ${CFG.pausas.map(p=>{const i=hours.indexOf(Math.floor(p.time/60));return i<0?"":`<rect x="${10+i*step}" y="0" width="${step}" height="${H}" fill="#E3EEFF"/>`;}).join("")}
+      ${c.map((v,i)=>{const x=10+i*step+(step-bw)/2,h=v/max*(H-22);return `<rect x="${x}" y="${H-h}" width="${bw}" height="${h}" rx="3" fill="#4A90D9"/>
+        ${v?`<text x="${x+bw/2}" y="${H-h-5}" text-anchor="middle" font-size="11" fill="#5B6B7D">${v}</text>`:""}
+        <text x="${x+bw/2}" y="${H+16}" text-anchor="middle" font-size="11" fill="#5B6B7D">${lbl(hours[i])}</text>`;}).join("")}
+      <line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="#D6E0EC"/></svg>
+      <div class="legend"><span><i style="background:#E3EEFF;border:1px solid #BBD3F5"></i>Horas programadas (10 a.m. y 3 p.m.)</span></div></div>`;
+  }
+  // categorías
+  const cEl=document.getElementById("chartCats");
+  const byEx={};recs.forEach(r=>{const k=r.type==="planta"?"🏭 Pausa en planta":(r.exercise||CAT_NAMES[r.category]||"Sin dato");byEx[k]=(byEx[k]||0)+1;});
+  const top=Object.entries(byEx).sort((a,b)=>b[1]-a[1]).slice(0,8),mx=top.length?top[0][1]:1;
+  cEl.innerHTML=top.length?top.map(([k,v])=>`<div class="hbar"><span class="t" title="${esc(k)}">${esc(k)}</span><span class="b"><i style="width:${v/mx*100}%;background:${k.startsWith("🏭")?"#66BB6A":"#1565C0"}"></i></span><span class="n">${v}</span></div>`).join(""):'<p class="small">Sin datos.</p>';
+}
+
+function renderPeopleTable(){
+  const card=document.getElementById("tableCard");
+  if(!dash.people.length){card.innerHTML='<div class="card-title sm">Seguimiento por persona</div><p class="small">Sin registros en este período. Si crees que debería haber datos, revisa el texto gris de arriba: muestra cuántos registros tiene la hoja y la fecha del último.</p>';return;}
+  const q=norm(dash.q);
+  const rows=dash.people.filter(p=>!q||norm(p.name).includes(q)).sort((a,b)=>{
+    const k=dash.sort,va=a[k],vb=b[k];return (typeof va==="string"?va.localeCompare(vb):va-vb)*dash.dir;});
+  const th=(k,l,c="")=>`<th class="sortable ${c}" data-sort="${k}">${l}${dash.sort===k?(dash.dir>0?" ▲":" ▼"):""}</th>`;
+  const bd=dash.res?dash.res.bdays:1;
+  card.innerHTML=`<div class="table-tools"><div class="card-title sm" style="margin:0">Seguimiento por persona</div>
+    <input type="search" id="peopleSearch" placeholder="Buscar persona…" value="${esc(dash.q)}"></div>
+    <div class="table-scroll"><table><thead><tr>${th("name","Persona")}${th("am","Mañana","c")}${th("pm","Tarde","c")}${th("planta","🏭 Planta","c")}${th("seconds","Tiempo","c")}${th("last","Última pausa")}${th("pct","Cumplimiento")}</tr></thead>
+    <tbody>${rows.map(p=>`<tr><td>${esc(p.name)}</td><td class="mono c">${p.am}/${bd}</td><td class="mono c">${p.pm}/${bd}</td><td class="mono c">${p.planta}</td>
+      <td class="mono c">${p.seconds?fmtMin(p.seconds)+" min":"—"}</td>
+      <td class="mono">${p.last?new Date(p.last).toLocaleString("es-CO",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}):"—"}</td>
+      <td><span class="bar-bg"><span class="bar-fill" style="width:${Math.min(100,p.pct)}%"></span></span><span class="${pctClass(p.pct)}">${p.pct}%</span></td></tr>`).join("")}</tbody></table></div>
+    <p class="small" style="margin-top:8px">Tiempo: minutos dedicados a las pausas (las de planta cuentan 5 min).</p>`;
+  card.querySelectorAll("th.sortable").forEach(h=>h.addEventListener("click",()=>{const k=h.dataset.sort;dash.dir=dash.sort===k?-dash.dir:(k==="name"?1:-1);dash.sort=k;renderPeopleTable();}));
+  const s=document.getElementById("peopleSearch");s.addEventListener("input",()=>{dash.q=s.value;const pos=s.selectionStart;renderPeopleTable();const n=document.getElementById("peopleSearch");n.focus();n.setSelectionRange(pos,pos);});
+}
+const norm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+
+function renderDetail(){
+  const card=document.getElementById("detailCard"),recs=dash.records;
+  if(!recs.length){card.innerHTML='<div class="card-title sm">Detalle de pausas</div><p class="small">'+(dash.res&&dash.res.legacy?"Disponible al actualizar el Apps Script.":"Sin pausas en este período.")+'</p>';return;}
+  const list=dash.all?recs:recs.slice(0,15);
+  card.innerHTML=`<div class="card-title sm">Detalle de pausas (${recs.length})</div>
+    <div class="table-scroll"><table><thead><tr><th>Fecha</th><th>Hora</th><th>Persona</th><th>Jornada</th><th>Dónde</th><th>Ejercicio</th><th class="c">Duración</th></tr></thead>
+    <tbody>${list.map(r=>`<tr><td class="mono">${fmtDate(r.date)}</td><td class="mono">${r.time}</td><td>${esc(r.name)}</td><td>${r.session==="am"?"Mañana":"Tarde"}</td>
+      <td>${r.type==="planta"?"🏭 Planta":"📱 App"}</td><td>${esc(r.type==="planta"?"—":(r.exercise||CAT_NAMES[r.category]||"—"))}</td><td class="mono c">${r.duration?fmtMin(r.duration)+" min":"—"}</td></tr>`).join("")}</tbody></table></div>
+    ${recs.length>15?`<p style="margin-top:8px"><button class="link-btn" id="detailMore">${dash.all?"Ver menos":"Ver las "+recs.length+" pausas"}</button></p>`:""}`;
+  const b=document.getElementById("detailMore");if(b)b.addEventListener("click",()=>{dash.all=!dash.all;renderDetail();});
+}
+
+/* Descargas */
+function exportRows(){
+  const bd=dash.res?dash.res.bdays:1;
+  const resumen=[["Persona","Mañana","Tarde","Total","En planta","En app","Minutos","Última pausa","Cumplimiento %"],
+    ...dash.people.slice().sort((a,b)=>b.pct-a.pct).map(p=>[p.name,p.am,p.pm,p.total,p.planta,p.app,Math.round(p.seconds/60),p.last?new Date(p.last).toLocaleString("es-CO"):"",p.pct])];
+  const detalle=[["Fecha","Hora","Persona","Jornada","Dónde","Ejercicio","Categoría","Duración (min)","Dispositivo"],
+    ...dash.records.slice().reverse().map(r=>[r.date,r.time,r.name,r.session==="am"?"Mañana":"Tarde",r.type==="planta"?"En planta":"App",r.exercise,CAT_NAMES[r.category]||r.category,r.duration?Math.round(r.duration/6)/10:"",r.device])];
+  const info=[["Reporte Pausa Activa · Termo Mechero Morro"],["Período",dash.res&&dash.res.from?`${dash.res.from} a ${dash.res.to}`:""],["Días hábiles a la fecha",bd],["Meta por persona",bd*2],["Generado",new Date().toLocaleString("es-CO")]];
+  return{resumen,detalle,info};
+}
+function loadScript(src){return new Promise((ok,ko)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=ko;document.head.appendChild(s);});}
+document.getElementById("dlExcel").addEventListener("click",async()=>{
+  if(!dash.res){showToast("Primero carga el reporte.");return;}
+  try{
+    if(!window.XLSX)await loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
+    const{resumen,detalle,info}=exportRows(),wb=XLSX.utils.book_new();
+    const add=(rows,name,widths)=>{const ws=XLSX.utils.aoa_to_sheet(rows);ws["!cols"]=widths.map(w=>({wch:w}));XLSX.utils.book_append_sheet(wb,ws,name);};
+    add(resumen,"Por persona",[30,9,9,8,10,8,9,20,14]);
+    add(detalle,"Detalle de pausas",[12,7,30,10,10,30,24,14,11]);
+    add(info,"Información",[26,30]);
+    XLSX.writeFile(wb,`PausaActiva_TMM_${dash.label}.xlsx`);
+  }catch(e){showToast("No se pudo crear el Excel. Usa ⬇ CSV.");}
+});
+document.getElementById("dlCsv").addEventListener("click",()=>{
+  if(!dash.res){showToast("Primero carga el reporte.");return;}
+  const{detalle,resumen}=exportRows(),rows=dash.records.length?detalle:resumen;
+  const csv="\uFEFF"+rows.map(r=>r.map(v=>{const s=String(v==null?"":v);return/[;"\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}).join(";")).join("\r\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+  a.download=`PausaActiva_TMM_${dash.label}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+});
+
+/* Correo */
+document.getElementById("mailBtn").addEventListener("click",async()=>{
+  const btn=document.getElementById("mailBtn"),msg=document.getElementById("mailMsg");
+  const month=document.getElementById("mailMonth").value,to=document.getElementById("mailTo").value.trim();
+  if(to&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to.split(",")[0].trim())){msg.style.color="var(--red)";msg.textContent="Revisa el correo.";return;}
+  btn.disabled=true;btn.textContent="Enviando…";msg.textContent="";
+  const res=await api({action:"sendReport",key:repKey,month,to});
+  btn.disabled=false;btn.textContent="Enviar reporte";
+  if(res.ok){msg.style.color="var(--green)";msg.textContent=`Reporte enviado a ${res.sentTo} (${res.records} pausas).`;}
+  else{msg.style.color="var(--red)";msg.textContent=/Acción no reconocida/.test(res.error||"")?"Falta actualizar el Apps Script para enviar correos.":(res.error||"No se pudo enviar.");}
+});
 
 /* ── PODIO ── */
 async function loadPodio(){
   document.getElementById("podiumArea").innerHTML='<p class="small">Cargando podio desde Google Sheets…</p>';
-  const res=await api({action:"getReport",key:GATE,mode:"semana"});
-  if(!res.ok){document.getElementById("podiumArea").innerHTML='<p class="err">No se pudo cargar el podio.</p>';return;}
-  const people=res.people||{};
-  const sorted=Object.values(people).sort((a,b)=>(b.am+b.pm)-(a.am+a.pm)).slice(0,3).map(p=>({...p,total:p.am+p.pm}));
-  const maxP=5*2;
-  // Get week range
+  const res=await api({action:"getPodium"});
+  if(!res.ok){document.getElementById("podiumArea").innerHTML='<p class="err">No se pudo cargar el podio. Verifica que el Apps Script esté actualizado.</p>';return;}
+  const sorted=(res.top||[]).filter(p=>p.total>0);
+  const maxP=10;
   const now=new Date();const dow=now.getDay();const dm=dow===0?-6:1-dow;
   const mon=new Date(now);mon.setDate(now.getDate()+dm);
   const fri=new Date(mon);fri.setDate(mon.getDate()+4);
@@ -1170,7 +1451,7 @@ async function loadPodio(){
   positions.forEach(({pos,label,data})=>{
     if(!data){cols+=`<div class="podium-col ${pos}"><div class="podium-block" style="opacity:.15;height:${pos==="pos-1"?"110":pos==="pos-2"?"82":"62"}px">${label}</div></div>`;return;}
     const p=Math.round((data.total/maxP)*100);const crown=pos==="pos-1"?'<span class="crown">👑</span>':"";
-    cols+=`<div class="podium-col ${pos}"><div class="podium-avatar">${crown}${initials(data.name)}</div><div class="podium-name">${data.name.split(" ")[0]}</div><div class="podium-score">${data.total} pausas · ${p}%</div><div class="podium-block">${label}</div></div>`;
+    cols+=`<div class="podium-col ${pos}"><div class="podium-avatar">${crown}${initials(data.name)}</div><div class="podium-name">${esc(data.name.split(" ")[0])}</div><div class="podium-score">${data.total} pausas · ${p}%</div><div class="podium-block">${label}</div></div>`;
   });
   document.getElementById("podiumArea").innerHTML=`<div class="podium-card">
     <div class="podium-logo-row">${logoSrc?`<img src="${logoSrc}" alt="Logo">`:""}
@@ -1182,6 +1463,7 @@ async function loadPodio(){
     <div class="podium-footer">💪 Cada pausa activa cuenta · Programa de Bienestar</div>
   </div>`;
 }
+
 document.getElementById("podiumRefresh").addEventListener("click",loadPodio);
 document.getElementById("podiumShare").addEventListener("click",()=>{
   const now=new Date();const dow=now.getDay();const dm=dow===0?-6:1-dow;
